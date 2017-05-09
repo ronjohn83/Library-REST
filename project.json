@@ -14,8 +14,10 @@
     "Microsoft.Extensions.Configuration.FileExtensions": "1.0.1",
     "Microsoft.Extensions.Configuration.Json": "1.0.1",
     "Microsoft.EntityFrameworkCore.SqlServer": "1.0.1",
-    "AutoMapper": "6.0.2",
-    "Microsoft.AspNetCore.Mvc.Formatters.Xml": "1.0.1"
+    "AutoMapper": "5.2.0",
+    "Microsoft.AspNetCore.Mvc.Formatters.Xml": "1.0.1",
+    "Microsoft.Extensions.Logging.Debug": "1.1.1",
+    "System.Linq.Dynamic.Core": "1.0.6.13"
   },
 
   "tools": {
@@ -52,6 +54,5 @@
 
   "scripts": {
     "postpublish": [ "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%" ]
-  },
-  "userSecretsId": "aspnet-Library.API-20170326122123"
+  }
 }
