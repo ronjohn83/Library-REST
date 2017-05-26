@@ -9,12 +9,10 @@ namespace Library.API.Services
     public class LibraryRepository : ILibraryRepository
     {
         private LibraryContext _context;
-        private IPropertyMappingService _propertyMappingService;
 
-        public LibraryRepository(LibraryContext context, IPropertyMappingService propertyMappingService)
+        public LibraryRepository(LibraryContext context)
         {
             _context = context;
-            _propertyMappingService = propertyMappingService;
         }
 
         public void AddAuthor(Author author)
@@ -69,17 +67,13 @@ namespace Library.API.Services
 
         public PagedList<Author> GetAuthors(AuthorsResourceParameters authorsResourceParameters)
         {
-
             var collectionBeforePaging = _context.Authors
                 .OrderBy(a => a.FirstName)
                 .ThenBy(a => a.LastName).AsQueryable();
 
-            //var collectionBeforePaging = _context.Authors.ApplySort(
-            //    authorsResourceParameters.OrderBy,
-            //    _mappingDictionary);
-
             if (!string.IsNullOrEmpty(authorsResourceParameters.Genre))
             {
+                // trim & ignore casing
                 var genreForWhereClause = authorsResourceParameters.Genre
                     .Trim().ToLowerInvariant();
                 collectionBeforePaging = collectionBeforePaging
@@ -88,7 +82,8 @@ namespace Library.API.Services
 
             if (!string.IsNullOrEmpty(authorsResourceParameters.SearchQuery))
             {
-               var searchQueryForWhereClause = authorsResourceParameters.SearchQuery
+                //trim & ignore casing
+                var searchQueryForWhereClause = authorsResourceParameters.SearchQuery
                     .Trim().ToLowerInvariant();
 
                 collectionBeforePaging = collectionBeforePaging
@@ -100,8 +95,6 @@ namespace Library.API.Services
             return PagedList<Author>.Create(collectionBeforePaging,
                 authorsResourceParameters.PageNumber,
                 authorsResourceParameters.PageSize);
-
-
         }
 
         public IEnumerable<Author> GetAuthors(IEnumerable<Guid> authorIds)
@@ -138,24 +131,5 @@ namespace Library.API.Services
         {
             return (_context.SaveChanges() >= 0);
         }
-    }
-
-    public class LinkDto
-    {
-        public string Href { get; set; }
-        public string Rel { get; set; }
-        public string Method { get; set; }
-
-        public LinkDto(string href, string rel, string method)
-        {
-            Href = href;
-            Rel = rel;
-            Method = method;
-        }
-    }
-
-    public abstract class LinkedResourceBaseDto
-    {
-        public List<LinkDto> Links { get; set; } = new List<LinkDto>();
     }
 }

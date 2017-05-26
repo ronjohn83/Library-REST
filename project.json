@@ -14,10 +14,10 @@
     "Microsoft.Extensions.Configuration.FileExtensions": "1.0.1",
     "Microsoft.Extensions.Configuration.Json": "1.0.1",
     "Microsoft.EntityFrameworkCore.SqlServer": "1.0.1",
-    "AutoMapper": "5.2.0",
-    "Microsoft.AspNetCore.Mvc.Formatters.Xml": "1.0.1",
+    "AutoMapper": "6.0.2",
+    "Microsoft.AspNetCore.Mvc.Formatters.Xml": "1.1.2",
     "Microsoft.Extensions.Logging.Debug": "1.1.1",
-    "System.Linq.Dynamic.Core": "1.0.6.13"
+    "NLog.Extensions.Logging": "1.0.0-rtm-beta5"
   },
 
   "tools": {

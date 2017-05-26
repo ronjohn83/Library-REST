@@ -1,18 +1,24 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Library.API.Services;
 using Library.API.Entities;
-using Microsoft.EntityFrameworkCore;
 using Library.API.Helpers;
+using Library.API.Models;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
+using NLog.Extensions.Logging;
 
 namespace Library.API
 {
@@ -59,8 +65,6 @@ namespace Library.API
                     implementationFactory.GetService<IActionContextAccessor>().ActionContext;
                 return new UrlHelper(actionContext);
             });
-
-            services.AddTransient<IPropertyMappingService, PropertyMappingService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -68,7 +72,10 @@ namespace Library.API
             ILoggerFactory loggerFactory, LibraryContext libraryContext)
         {
             loggerFactory.AddConsole();
+
             loggerFactory.AddDebug(LogLevel.Information);
+
+            loggerFactory.AddNLog();
 
             if (env.IsDevelopment())
             {
@@ -84,37 +91,35 @@ namespace Library.API
                         if (exceptionHandlerFeature != null)
                         {
                             var logger = loggerFactory.CreateLogger("Global exception logger");
-                            logger.LogError(500, 
+                            logger.LogError(500,
                                 exceptionHandlerFeature.Error,
                                 exceptionHandlerFeature.Error.Message);
-                           
                         }
 
                         context.Response.StatusCode = 500;
                         await context.Response.WriteAsync("An unexpected fault happened. Try again later.");
-
-                    });                      
+                    });
                 });
             }
 
-          
             AutoMapper.Mapper.Initialize(cfg =>
             {
                 cfg.CreateMap<Entities.Author, Models.AuthorDto>()
-                    .ForMember(dest => dest.Name, opt => opt.MapFrom(src =>
+                    .ForMember(des => des.Name, opt => opt.MapFrom(src =>
                         $"{src.FirstName} {src.LastName}"))
-                    .ForMember(dest => dest.Age, opt => opt.MapFrom(src =>
+                    .ForMember(des => des.Age, opt => opt.MapFrom(src =>
                         src.DateOfBirth.GetCurrentAge()));
 
                 cfg.CreateMap<Entities.Book, Models.BooksDto>();
 
-                cfg.CreateMap<Models.AuthorForCreationDto, Entities.Author>();
+                cfg.CreateMap<AuthorForCreationDto, Entities.Author>();
 
-                cfg.CreateMap<Models.BookForCreationDto, Entities.Book>();
+                cfg.CreateMap<BookForCreationDto, Entities.Book>();
 
-                cfg.CreateMap<Models.BookForUpdateDto, Entities.Book>();
+                cfg.CreateMap<BookForUpdateDto, Entities.Book>();
 
                 cfg.CreateMap<Entities.Book, Models.BookForUpdateDto>();
+
             });
 
             libraryContext.EnsureSeedDataForContext();
